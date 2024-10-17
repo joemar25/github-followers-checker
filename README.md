@@ -1,35 +1,71 @@
-# Documentation
+# GitHub Follower Monitor
 
-[Reference](https://www.pronextjs.dev/workshops/pro-next-js-workshop-hl06z/create-and-deploy-a-nextjs-application)
+**GitHub Follower Monitor** is a tool that helps you track and manage your GitHub following. It checks whether users you follow are also following you back, making it easier to clean up your following list by unfollowing those who don't reciprocate.
 
-## Step by Step
+## Features
+- Track and manage your GitHub followers.
+- Detect whether users you follow are following you back.
+- Reduce the count of your "following" easily by unfollowing non-followers.
+- Simple and intuitive interface with real-time updates.
 
-1. Creation of new project:
+## Installation
 
-    ```bash
-    pnpm dlx create-next-app@latest _APP_TITLE_ --use pnpm
-    ```
+### Step by Step Guide
 
-    Note: Yes to all
+1. **Create a New Next.js Project**
 
-2. Node Modules
+   Use the following command to create a new Next.js project with pnpm:
 
-    ```bash
-    pnpm run dev
-    ```
+   ```bash
+   pnpm dlx create-next-app@latest _APP_TITLE_ --use pnpm
+   ```
 
-3. ShadCN
+   When prompted, select "Yes" to all options.
 
-    ```bash
-    # instead of:
-    # pnpm dlx shadcn@latest init
-    # use this:
-    pnpm dlx shadcn@latest init -d
-    ```
+2. **Run the Project**
 
-## Documentation to read
+   Install dependencies and run the development server:
 
-1. [Followers](https://docs.github.com/en/rest/users/followers?apiVersion=2022-11-28) Github Endpoints
-2. [OAuth](https://github.com/settings/developers)
-3. Inspired From This [video](https://www.youtube.com/watch?v=O8Ae6MC5bf4&ab_channel=tapaScriptbyTapasAdhikary) but full modified for a typescript code and optimization. It was from Next-Auth-5, and this is the [code](https://github.com/tapascript/learn-next-auth) documentation.
-4. Auth Error Encounter [Fix](https://forum.codewithmosh.com/t/next-js-error-when-implementing-sessionprovider/24629/2) For SessionProvider
+   ```bash
+   pnpm run dev
+   ```
+
+3. **ShadCN UI Integration**
+
+   Set up ShadCN with the following command to initialize with a custom directory (`-d` flag):
+
+   ```bash
+   pnpm dlx shadcn@latest init -d
+   ```
+
+## Usage
+
+1. **OAuth Setup**
+
+   - Go to your GitHub [OAuth Apps settings](https://github.com/settings/developers).
+   - Create a new OAuth app and configure the necessary callback URLs.
+   - Store your `CLIENT_ID` and `CLIENT_SECRET` for integrating authentication.
+
+2. **GitHub API**
+
+   The app uses the GitHub API to retrieve the list of followers and followings. Check the [GitHub Followers API documentation](https://docs.github.com/en/rest/users/followers?apiVersion=2022-11-28) for reference on endpoints.
+
+3. **Authentication**
+
+   The app leverages OAuth for authentication to access your GitHub account securely. The setup was inspired by [this video](https://www.youtube.com/watch?v=O8Ae6MC5bf4&ab_channel=tapaScriptbyTapasAdhikary) and adapted to use TypeScript for optimized performance. You can review the original Next-Auth setup in this [repository](https://github.com/tapascript/learn-next-auth).
+
+   In case of any session provider errors, check this [auth error fix](https://forum.codewithmosh.com/t/next-js-error-when-implementing-sessionprovider/24629/2).
+
+## Documentation to Read
+
+1. [GitHub Followers API](https://docs.github.com/en/rest/users/followers?apiVersion=2022-11-28)
+2. [GitHub OAuth Documentation](https://github.com/settings/developers)
+3. [OAuth Setup Tutorial](https://www.youtube.com/watch?v=O8Ae6MC5bf4&ab_channel=tapaScriptbyTapasAdhikary) with Next.js and Next-Auth.
+
+## Future Work
+- Implement automatic unfollowing of users who don't follow you back.
+- Add user notifications for follow-back status changes.
+- Optimize the UI with ShadCN components and styling.
+
+## Contributions
+Feel free to open issues or submit pull requests for feature suggestions or bug fixes. All contributions are welcome!
