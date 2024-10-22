@@ -1,9 +1,10 @@
 // src\components\pages\authentication.tsx
 "use client";
 
-import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
+
+import { Metadata } from "next"
 import { ModeToggle } from "../ui/mode-toggle"
 import { UserAuthForm } from "../auth/user-auth-form";
 
@@ -17,14 +18,14 @@ export default function AuthenticationPage() {
         <>
             <div className="md:hidden">
                 <Image
-                    src="/examples/authentication-light.png"
+                    src="https://img.freepik.com/free-vector/background-wave-minimalist-modern-style_483537-5220.jpg"
                     width={1280}
                     height={843}
                     alt="Authentication"
                     className="block dark:hidden"
                 />
                 <Image
-                    src="/examples/authentication-dark.png"
+                    src="https://static.vecteezy.com/system/resources/thumbnails/007/718/309/small/minimalist-dark-gradient-wave-background-simple-design-for-your-website-free-vector.jpg"
                     width={1280}
                     height={843}
                     alt="Authentication"

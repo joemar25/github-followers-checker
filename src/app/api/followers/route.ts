@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import axios from 'axios';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
@@ -32,8 +32,7 @@ async function fetchAllPages(url: string, accessToken: string): Promise<GitHubUs
     return allUsers;
 }
 
-export async function GET(req: NextRequest) {
-    console.log(req);
+export async function GET() {
     const session = await getServerSession(authOptions);
 
     if (!session?.accessToken) {

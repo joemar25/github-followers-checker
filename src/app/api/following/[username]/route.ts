@@ -1,9 +1,10 @@
+// src\app\api\following\[username]\route.ts
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 
-export async function PUT(req: NextRequest, { params }: { params: { username: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { username: string } }) {
     const session = await getServerSession(authOptions);
 
     if (!session?.accessToken) {
@@ -16,23 +17,19 @@ export async function PUT(req: NextRequest, { params }: { params: { username: st
     }
 
     try {
-        await axios.put(
-            `https://api.github.com/user/following/${username}`,
-            {},
-            {
-                headers: {
-                    Authorization: `Bearer ${session.accessToken}`,
-                    Accept: "application/vnd.github+json",
-                    "X-GitHub-Api-Version": "2022-11-28",
-                },
-            }
-        );
+        await axios.delete(`https://api.github.com/user/following/${username}`, {
+            headers: {
+                Authorization: `Bearer ${session.accessToken}`,
+                Accept: "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+        });
         return new NextResponse(null, { status: 204 });
     } catch (error) {
-        console.error("Error following user:", error);
+        console.error("Error unfollowing user:", error);
         if (axios.isAxiosError(error) && error.response) {
-            return NextResponse.json({ error: error.response.data.message || "Failed to follow user." }, { status: error.response.status });
+            return NextResponse.json({ error: error.response.data.message || "Failed to unfollow user." }, { status: error.response.status });
         }
-        return NextResponse.json({ error: "Failed to follow user." }, { status: 500 });
+        return NextResponse.json({ error: "Failed to unfollow user." }, { status: 500 });
     }
 }

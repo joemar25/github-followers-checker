@@ -1,8 +1,10 @@
+// src\app\dashboard\page.tsx
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import useSWR from "swr";
 import axios from "axios";
+import { useEffect, useState } from "react";
 import { GitHubUser } from "@/types/github";
 import PaginatedList from "@/components/dashboard/PaginatedList";
 import Logout from "@/components/auth/logout";
@@ -12,50 +14,55 @@ import { toast, Toaster } from "sonner";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 
+const fetcher = (url: string) => axios.get(url).then(res => res.data);
+
 const Dashboard: React.FC = () => {
   const { data: session, status } = useSession({ required: true });
-  const [followers, setFollowers] = useState<GitHubUser[]>([]);
-  const [following, setFollowing] = useState<GitHubUser[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingDots, setLoadingDots] = useState<string>(".");
+  const [unfollowing, setUnfollowing] = useState<Set<string>>(new Set());
 
-  const refreshData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [followersResponse, followingResponse] = await Promise.all([
-        axios.get<GitHubUser[]>("/api/followers"),
-        axios.get<GitHubUser[]>("/api/following"),
-      ]);
+  // Loading animation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLoadingDots((prev) => (prev === "..." ? "." : prev + "."));
+    }, 500);
 
-      setFollowers(followersResponse.data);
-      setFollowing(followingResponse.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      toast.error("Failed to fetch data. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (session) {
-      refreshData();
-    }
-  }, [session, refreshData]);
+  // Use SWR for caching and automatic revalidation
+  const { data: followers, mutate: mutateFollowers, isLoading: followersLoading } = useSWR<GitHubUser[]>(
+    session ? "/api/followers" : null,
+    fetcher,
+    { refreshInterval: 60000 }
+  );
+
+  const { data: following, mutate: mutateFollowing, isLoading: followingLoading } = useSWR<GitHubUser[]>(
+    session ? "/api/following" : null,
+    fetcher,
+    { refreshInterval: 60000 }
+  );
 
   const handleUnfollow = async (username: string) => {
+    if (unfollowing.has(username)) return; // Prevent multiple clicks for the same user.
+
+    setUnfollowing((prev) => new Set(prev).add(username));
     try {
       await axios.delete(`/api/following/${username}`);
-      refreshData();
+      // Optimistically update the SWR cache
+      mutateFollowing();
+      mutateFollowers();
+      toast.success(`Successfully unfollowed ${username}`);
     } catch (error) {
       console.error(`Failed to unfollow ${username}`, error);
       toast.error(`Failed to unfollow ${username}. Please try again.`);
     }
   };
 
-  if (status === "loading" || loading) {
+  if (status === "loading" || followersLoading || followingLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p>Loading...</p>
+        <p>Loading{loadingDots}</p>
       </div>
     );
   }
@@ -68,13 +75,13 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  const followerSet = new Set(followers.map((user) => user.login));
-  const notFollowingBack = following.filter(
+  const followerSet = new Set(followers?.map((user) => user.login) || []);
+  const notFollowingBack = following?.filter(
     (user) => !followerSet.has(user.login)
-  );
-  const mutualFollows = followers.filter((user) =>
-    following.some((f) => f.login === user.login)
-  );
+  ) || [];
+  const mutualFollows = followers?.filter((user) =>
+    following?.some((f) => f.login === user.login)
+  ) || [];
 
   return (
     <div className="mx-auto p-4 space-y-6">
@@ -90,12 +97,12 @@ const Dashboard: React.FC = () => {
       <BentoGrid className="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3">
         <BentoGridItem
           title="Followers"
-          description={followers.length.toString()}
+          description={followers?.length.toString() || "0"}
           className="p-2 flex flex-col items-center justify-center text-center"
         />
         <BentoGridItem
           title="Following"
-          description={following.length.toString()}
+          description={following?.length.toString() || "0"}
           className="p-2 flex flex-col items-center justify-center text-center"
         />
         <BentoGridItem
@@ -141,8 +148,9 @@ const Dashboard: React.FC = () => {
                     <Button
                       variant="secondary"
                       onClick={() => handleUnfollow(user.login)}
+                      disabled={unfollowing.has(user.login)}
                     >
-                      Unfollow
+                      {unfollowing.has(user.login) ? "Unfollowing..." : "Unfollow"}
                     </Button>
                   </li>
                 )}
