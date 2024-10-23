@@ -3,6 +3,7 @@
 **GitHub Follower Monitor** is a tool that helps you track and manage your GitHub following. It checks whether users you follow are also following you back, making it easier to clean up your following list by unfollowing those who don't reciprocate.
 
 ## Features
+
 - Track and manage your GitHub followers.
 - Detect whether users you follow are following you back.
 - Reduce the count of your "following" easily by unfollowing non-followers.
@@ -63,9 +64,12 @@
 3. [OAuth Setup Tutorial](https://www.youtube.com/watch?v=O8Ae6MC5bf4&ab_channel=tapaScriptbyTapasAdhikary) with Next.js and Next-Auth.
 
 ## Future Work
+
 - Implement automatic unfollowing of users who don't follow you back.
 - Add user notifications for follow-back status changes.
 - Optimize the UI with ShadCN components and styling.
+- Must be able to create more request.
 
 ## Contributions
+
 Feel free to open issues or submit pull requests for feature suggestions or bug fixes. All contributions are welcome!

@@ -18,14 +18,14 @@ export default function AuthenticationPage() {
         <>
             <div className="md:hidden">
                 <Image
-                    src="https://img.freepik.com/free-vector/background-wave-minimalist-modern-style_483537-5220.jpg"
+                    src="/images/background.jpg"
                     width={1280}
                     height={843}
                     alt="Authentication"
                     className="block dark:hidden"
                 />
                 <Image
-                    src="https://static.vecteezy.com/system/resources/thumbnails/007/718/309/small/minimalist-dark-gradient-wave-background-simple-design-for-your-website-free-vector.jpg"
+                    src="/images/background.jpg"
                     width={1280}
                     height={843}
                     alt="Authentication"
