@@ -1,93 +1,80 @@
-// src\components\pages\authentication.tsx
 "use client";
 
-import Image from "next/image"
-import Link from "next/link"
-
-import { Metadata } from "next"
-import { ModeToggle } from "../ui/mode-toggle"
+import { Metadata } from "next";
+import { ModeToggle } from "../ui/mode-toggle";
 import { UserAuthForm } from "../auth/user-auth-form";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Github } from "lucide-react";
+import Image from "next/image";
 
 export const metadata: Metadata = {
     title: "Authentication",
     description: "Authentication forms built using the components.",
-}
+};
 
 export default function AuthenticationPage() {
     return (
-        <>
-            <div className="md:hidden">
-                <Image
-                    src="/images/background.jpg"
-                    width={1280}
-                    height={843}
-                    alt="Authentication"
-                    className="block dark:hidden"
-                />
-                <Image
-                    src="/images/background.jpg"
-                    width={1280}
-                    height={843}
-                    alt="Authentication"
-                    className="hidden dark:block"
-                />
-            </div>
-            <div className="container relative hidden h-[800px] flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-                <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-                    <div className="absolute inset-0 bg-zinc-900" />
-                    <div className="relative z-20 flex items-center text-lg font-medium">
-                        {/* <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="mr-2 h-6 w-6"
-                        >
-                            <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-                        </svg> */}
-                        {/* Mar 25 */}
-                        <ModeToggle />
-                    </div>
-                    <div className="relative z-20 mt-auto">
-                        <blockquote className="space-y-2">
-                            <p className="text-lg">
-                                &ldquo;This is for you guys out there and your followers in github if they did not follow you back.&rdquo;
-                            </p>
-                            <footer className="text-sm">Joemar25</footer>
-                        </blockquote>
-                    </div>
+        <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+            {/* Left Side */}
+            <div className="relative hidden h-full flex-col p-10 text-white dark:border-r lg:flex">
+                {/* Background with image and fallback gradient */}
+                <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 to-zinc-800">
+                    <Image
+                        src="/images/bg.jpg"
+                        alt="Background Image"
+                        fill
+                        className="object-cover"
+                        priority
+                        sizes="(max-width: 1024px) 0vw, 50vw"
+                    />
                 </div>
-                <div className="lg:p-8">
-                    <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                        <div className="flex flex-col space-y-2 text-center">
-                            <h1 className="text-2xl font-semibold tracking-tight">
-                                Sign in with your Github Account now
-                            </h1>
-                        </div>
-                        <UserAuthForm />
-                        <p className="px-8 text-center text-sm text-muted-foreground">
-                            By clicking continue, you agree to our{" "}
-                            <Link
-                                href="/terms"
-                                className="underline underline-offset-4 hover:text-primary"
-                            >
-                                Terms of Service
-                            </Link>{" "}
-                            and{" "}
-                            <Link
-                                href="/privacy"
-                                className="underline underline-offset-4 hover:text-primary"
-                            >
-                                Privacy Policy
-                            </Link>
-                            .
+                {/* Overlay to ensure text readability */}
+                <div className="absolute inset-0 bg-black/50" />
+
+                <div className="relative z-20 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <Github className="h-6 w-6" />
+                        <span className="text-lg font-medium">GitConnect</span>
+                    </div>
+                    <ModeToggle />
+                </div>
+                <div className="relative z-20 mt-auto">
+                    <blockquote className="space-y-6">
+                        <p className="text-xl font-medium leading-relaxed">
+                            Connect with the global developer community. Build your network, share your work,
+                            and discover amazing projects from developers around the world.
                         </p>
-                    </div>
+                        <footer className="flex items-center gap-4 text-sm">
+                            <div className="h-12 w-12 rounded-full bg-zinc-700/50 backdrop-blur-sm flex items-center justify-center">
+                                <Github className="h-6 w-6" />
+                            </div>
+                            <div>
+                                <p className="font-semibold">Join thousands of developers</p>
+                                <p className="text-zinc-300">who are already part of our community</p>
+                            </div>
+                        </footer>
+                    </blockquote>
                 </div>
             </div>
-        </>
-    )
+
+            {/* Right Side */}
+            <div className="lg:p-8">
+                <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+                    <Card className="border-0 shadow-lg">
+                        <CardHeader className="space-y-1">
+                            <h1 className="text-2xl font-semibold tracking-tight text-center">
+                                Welcome to GitConnect
+                            </h1>
+                            <p className="text-sm text-muted-foreground text-center">
+                                Sign in with GitHub to connect with developers and manage your network
+                            </p>
+                        </CardHeader>
+                        <CardContent>
+                            <UserAuthForm />
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        </div>
+    );
 }

@@ -1,41 +1,34 @@
-// src/auth.ts
-import type { NextAuthOptions } from "next-auth";
-import { getServerSession } from "next-auth";
-import GitHubProvider from "next-auth/providers/github";
+// auth.ts
+import { NextAuthOptions } from "next-auth";
+import GithubProvider from "next-auth/providers/github";
 
 export const authOptions: NextAuthOptions = {
     providers: [
-        GitHubProvider({
-            clientId: process.env.GITHUB_CLIENT_ID as string,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+        GithubProvider({
+            clientId: process.env.GITHUB_CLIENT_ID ?? '',
+            clientSecret: process.env.GITHUB_CLIENT_SECRET ?? '',
             authorization: {
                 params: {
-                    scope: "user",
-                },
-            },
-        }),
+                    scope: 'read:user user:follow'
+                }
+            }
+        })
     ],
     callbacks: {
-        // JWT Callback: Persist the access token in the JWT
         async jwt({ token, account }) {
-            if (account) {
+            if (account?.access_token) {
                 token.accessToken = account.access_token;
-                token.refreshToken = account.refresh_token;
-                token.expires_at = account.expires_at;
             }
             return token;
         },
-        // Session Callback: Make the access token available in the session
         async session({ session, token }) {
-            session.accessToken = token.accessToken as string;
-            return session;
-        },
+            return {
+                ...session,
+                accessToken: token.accessToken
+            };
+        }
     },
-    // It's a good practice to set a secret for NextAuth
-    secret: process.env.NEXTAUTH_SECRET,
+    pages: {
+        signIn: '/auth'
+    }
 };
-
-export async function getServerAuthSession() {
-    const session = await getServerSession(authOptions);
-    return session;
-}
