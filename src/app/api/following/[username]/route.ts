@@ -4,14 +4,14 @@ import axios from "axios";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 
-export async function DELETE(req: NextRequest, { params }: { params: { username: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ username: string }> }) {
     const session = await getServerSession(authOptions);
 
     if (!session?.accessToken) {
         return NextResponse.json({ error: "You must be logged in." }, { status: 401 });
     }
 
-    const { username } = params;
+    const { username } = await params;
     if (!username) {
         return NextResponse.json({ error: "Username is required." }, { status: 400 });
     }

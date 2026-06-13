@@ -39,11 +39,8 @@ async function fetchWithRetry<T>(
     }
 }
 
-async function fetchAllPages(url: string, accessToken: string): Promise<GitHubUser[]> {
-    let allUsers: GitHubUser[] = [];
-    let page = 1;
-    const perPage = 100; // Maximum allowed by GitHub API
-
+async function fetchAllPages(baseUrl: string, accessToken: string): Promise<GitHubUser[]> {
+    const perPage = 100;
     const headers = {
         Authorization: `Bearer ${accessToken}`,
         Accept: 'application/vnd.github+json',
@@ -51,23 +48,27 @@ async function fetchAllPages(url: string, accessToken: string): Promise<GitHubUs
     };
 
     try {
-        while (true) {
-            const pageUrl = `${url}?per_page=${perPage}&page=${page}`;
+        const firstPageUrl = `${baseUrl}?per_page=${perPage}&page=1`;
+        const response = await axios.get<GitHubUser[]>(firstPageUrl, { headers });
+        let allUsers = response.data;
 
-            const users = await fetchWithRetry<GitHubUser[]>(
-                pageUrl,
-                { headers }
-            );
-
-            if (users.length === 0) {
-                break;
+        const linkHeader = response.headers.link;
+        if (linkHeader) {
+            const lastPageMatch = linkHeader.match(/&page=(\d+)>;\s*rel="last"/);
+            if (lastPageMatch) {
+                const lastPage = parseInt(lastPageMatch[1], 10);
+                if (lastPage > 1) {
+                    const promises = [];
+                    for (let page = 2; page <= lastPage; page++) {
+                        const pageUrl = `${baseUrl}?per_page=${perPage}&page=${page}`;
+                        promises.push(fetchWithRetry<GitHubUser[]>(pageUrl, { headers }));
+                    }
+                    const results = await Promise.all(promises);
+                    for (const users of results) {
+                        allUsers = [...allUsers, ...users];
+                    }
+                }
             }
-
-            allUsers = [...allUsers, ...users];
-            page++;
-
-            // Optional: Add a small delay between requests to be nice to the API
-            await new Promise(resolve => setTimeout(resolve, 100));
         }
 
         return allUsers;

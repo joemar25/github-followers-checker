@@ -1,36 +1,79 @@
 // src\app\api\following\route.ts
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { GitHubUser } from '@/types/github';
 
-async function fetchAllPages(url: string, accessToken: string): Promise<GitHubUser[]> {
-    let allUsers: GitHubUser[] = [];
-    let nextUrl = url;
+interface GitHubAPIError {
+    message: string;
+    documentation_url?: string;
+}
 
-    while (nextUrl) {
-        const response = await axios.get<GitHubUser[]>(nextUrl, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                Accept: 'application/vnd.github+json',
-                'X-GitHub-Api-Version': '2022-11-28',
-            },
-        });
-        allUsers = [...allUsers, ...response.data];
+async function fetchWithRetry<T>(
+    url: string,
+    config: AxiosRequestConfig,
+    retries = 3,
+    delay = 1000
+): Promise<T> {
+    try {
+        const response = await axios.get<T>(url, config);
+        return response.data;
+    } catch (error) {
+        const axiosError = error as AxiosError<GitHubAPIError>;
+        if (
+            retries === 0 ||
+            axiosError.response?.status === 401 ||
+            axiosError.response?.status === 403
+        ) {
+            throw error;
+        }
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return fetchWithRetry<T>(url, config, retries - 1, delay * 2);
+    }
+}
+
+async function fetchAllPages(baseUrl: string, accessToken: string): Promise<GitHubUser[]> {
+    const perPage = 100;
+    const headers = {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+    };
+
+    try {
+        const firstPageUrl = `${baseUrl}?per_page=${perPage}&page=1`;
+        const response = await axios.get<GitHubUser[]>(firstPageUrl, { headers });
+        let allUsers = response.data;
 
         const linkHeader = response.headers.link;
-        nextUrl = '';
         if (linkHeader) {
-            const links = linkHeader.split(',');
-            const nextLink = links.find((link: string) => link.includes('rel="next"'));
-            if (nextLink) {
-                nextUrl = nextLink.split(';')[0].trim().slice(1, -1);
+            const lastPageMatch = linkHeader.match(/&page=(\d+)>;\s*rel="last"/);
+            if (lastPageMatch) {
+                const lastPage = parseInt(lastPageMatch[1], 10);
+                if (lastPage > 1) {
+                    const promises = [];
+                    for (let page = 2; page <= lastPage; page++) {
+                        const pageUrl = `${baseUrl}?per_page=${perPage}&page=${page}`;
+                        promises.push(fetchWithRetry<GitHubUser[]>(pageUrl, { headers }));
+                    }
+                    const results = await Promise.all(promises);
+                    for (const users of results) {
+                        allUsers = [...allUsers, ...users];
+                    }
+                }
             }
         }
-    }
 
-    return allUsers;
+        return allUsers;
+    } catch (error) {
+        const axiosError = error as AxiosError<GitHubAPIError>;
+        console.error('Error in fetchAllPages:',
+            axiosError.response?.status,
+            axiosError.response?.data
+        );
+        throw error;
+    }
 }
 
 export async function GET() {

@@ -6,6 +6,6 @@ export async function githubLogin() {
     await signIn('github', { callbackUrl: "/dashboard" });
 }
 
-export async function doLogout() {
+export async function logout() {
     await signOut({ callbackUrl: "/" });
 }
