@@ -11,7 +11,9 @@ const Logout: React.FC = () => {
 
     return (
         <Button
+            variant="outline"
             onClick={handleLogout}
+            className="rounded-full font-medium transition-all duration-300 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive/20"
         >
             Logout
         </Button>

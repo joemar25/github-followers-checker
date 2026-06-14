@@ -25,14 +25,20 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     };
 
     return (
-        <div className={cn("grid gap-6", className)} {...props}>
-            <Button onClick={handleLogin} variant="outline" type="button" disabled={isLoading}>
+        <div className={cn("grid gap-4", className)} {...props}>
+            <Button 
+                onClick={handleLogin} 
+                variant="outline" 
+                type="button" 
+                disabled={isLoading}
+                className="w-full py-5 border border-input bg-background transition-all duration-300 hover:bg-accent hover:text-accent-foreground hover:border-primary/20 active:scale-[0.98] rounded-xl font-semibold shadow-sm flex items-center justify-center gap-2.5 group"
+            >
                 {isLoading ? (
-                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                    <Icons.spinner className="h-4 w-4 animate-spin text-muted-foreground" />
                 ) : (
-                    <Icons.gitHub className="mr-2 h-4 w-4" />
+                    <Icons.gitHub className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
                 )}
-                GitHub
+                <span>Continue with GitHub</span>
             </Button>
         </div>
     );

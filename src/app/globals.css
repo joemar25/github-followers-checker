@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 @layer utilities {
@@ -70,12 +70,10 @@ body {
 
 @layer base {
   * {
-    @apply border-border select-none;
+    @apply border-border;
   }
-  Imgage,
-  Link,
   img {
-    @apply pointer-events-none;
+    @apply pointer-events-none select-none;
   }
   body {
     @apply bg-background text-foreground;
