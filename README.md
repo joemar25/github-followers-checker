@@ -73,3 +73,9 @@
 ## Contributions
 
 Feel free to open issues or submit pull requests for feature suggestions or bug fixes. All contributions are welcome!
+
+## License
+
+Copyright (c) 2026 Joemar Jane Cardiño. All rights reserved.
+
+This project and its codebase are proprietary and private. Commercial and non-commercial use, reproduction, distribution, or modification of this software is strictly prohibited without prior written permission.

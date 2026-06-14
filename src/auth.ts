@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2026 Joemar Jane Cardiño. All rights reserved.
+ * Proprietary and Confidential. Unauthorized copying of this file is strictly prohibited.
+ */
+
 // auth.ts
 import { NextAuthOptions } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
